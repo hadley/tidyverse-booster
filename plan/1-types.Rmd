@@ -1,0 +1,148 @@
+# Function types
+
+## Introduction/motivation
+
+<!-- Create new file -->
+
+In order to understand R code when you're reading it, you need to somehow execute the code in your head. This requires having a mental model of how R works (sometimes called a notational machine). This model must be much simpler than the real thing!
+
+An important component of that mental model is "function types". This is a shorthand meaning that you understand what are valid inputs (i.e. what types of things are permitted, and how are their sizes related), and how they affect the output. Understanding function types is a bit like unit analysis in physics; that lets you check that you're at least in the right ballpark.
+
+Confession: I'm not 100% sure how this helps you in practice; but I very strongly believe that it does, and a lot of the time when I'm reviewing code I see mistakes that are obvious to me because the types are inconsistent.
+
+---
+
+Let's make this concrete with an example:
+
+```{r, eval = FALSE}
+y <- sum(x)
+```
+
+If this code runs,
+
+* What can you tell me about `x`?
+* What can you tell me about `y`?
+
+Take a minute to discuss it with your neighbour.
+
+---
+
+`x` is a numeric or logical vector (ignoring complex)
+`y` is a numeric vector of length 1.
+
+## Vector types
+
+Today I'm going to focus on function that work with vectors, because this covers most functions (but not purrr!) that you might encounter in a data analysis. What are the nine most common types of vectors?
+
+---
+
+logical, numeric, character, factor, ordered factor, date, time, interval, list.
+(unimportant: raw, complex, integer/double distinction)
+
+special: data.frame, NA
+
+---
+
+The "type" of a function is the type of its inputs, and the type of its output. Can you describe the type of these functions: (Also think about the sizes!)
+
+* `mean()`
+* `diff()`
+* `dplyr::first()`
+* `dplyr::lag()`
+* `paste()` (with `collapse`)
+
+(Remeber red post-it means you need help; green means that you're done)
+
+---
+
+<!-- COMMIT TO GIT -->
+
+For most function the output type can be descrbied in a straightforward way from the types of its inputs. I think this is generally a really important principle: if you can't easily do this, then your simple mental model of R isn't going to work well with the function.
+
+```{r}
+complicated_type <- function(x, y) {
+  if (x < 0) {
+    "negative"
+  } else {
+    if (is.na(y)) {
+      NA
+    } else {
+      1
+    }
+  }
+}
+```
+
+You might've heard me talk about this idea of "type-stability": you should be able to easily predict the output type from the input types; it's stable because changes to the _values_ doesn't change the output type.
+
+## Sizes
+
+What about functions that take multiple vectors? There's another important principle at play:
+
+* `+`
+* `pmin()`
+* `paste()` (without `collapse`)
+* `data.frame()`
+
+---
+
+This behaviour is called **recycling** because the shorter vector is recycled to the same length as the longer (behaviour is inconsistent if it isn't repeated a whole number of times)
+
+
+```{r}
+1:3 + integer()
+1:3 + 1
+1:3 + 1:2
+1:3 + 1:3
+```
+
+Generally, in the tidyverse we're moving towards a more restricted version of recycling where we only recycle vectors of length 1 and throw an error for everything else.
+
+## Combining vectors
+
+One of the reasons I started thinking about and working on this was combining multiple vectors `c()`.
+
+---
+
+You've probably internalised the rules for numeric, logical, and character. Can you write them down? 
+
+---
+
+What happens when you add `NULL` into the mix?
+
+---
+
+Unfortunately these rules break down for S3 vectors:
+
+```{r}
+# WAT
+
+fa <- factor("a")
+fb <- factor("b")
+c(fa, fb)
+
+today <- as.Date("2019-09-13")
+lunch <- as.POSIXct("2018-09-13 13:00")
+
+c(today, lunch)
+c(lunch, today)
+
+c(today, fa)
+c(fa, today)
+
+lunch_home <- as.POSIXct("2018-09-13 13:00", tz = "US/Central")
+lunch_home
+c(lunch_home)
+c(lunch_home, NULL)
+```
+
+What makes them hard to understand?
+
+* Lack of symmetry: I think `c(x, y)` should yield the same type as `c(y, x)`
+  (obviously the values will be different)
+
+* Fails to recognise that some types are compatible with others.
+
+If you're interested in learning more, take a look at <https://vctrs.r-lib.org/index.html>.
+
+<!-- COMMIT TO GIT -->

@@ -1,0 +1,65 @@
+# Before we begin
+
+Make sure you have the tidyverse instaled:
+
+```{r, eval = FALSE}
+install.packages("tidyverse")
+install.packages("gapminder")
+usethis::use_course("http://bit.ly/30lAoSe")
+```
+
+# Welcome
+
+My name is Hadley. My job today is to help boost your tidyverse productivity:
+
+* Thinking about types
+* Using functional programming
+* Everything you really need to know about tidy eval
+
+And I'm going to be teaching you all this with live coding, which (full disclosure), I've never done before! 
+
+Your job:
+
+* Use post-its to give me feedback throughout the workshop (green = good; pink = slow down/problem)
+* Please ask questions! (Either to whole class or to me individually during breaks).
+  In particularly, if I do something that seems particularly magical 
+  (i.e. I don't type enough for what you see on the screen), tell me!
+
+At the end of the day I'll post all the code I type at <https://github.com/hadley/tidyverse-booster>. Avoid looking at it before then.
+
+## Warm ups
+
+Introduce yourself to your neighbours. What is your favourite dplyr function and why?
+
+A few challenges to get your brain warmed up:
+
+* What tidyverse packages are design to help with strings, date-times, factors?
+  What does the glue package do?
+
+* What does this code do?
+
+```{r}
+library(tidyverse)
+
+x <- 1:40
+case_when(
+  x %% 15 == 0 ~ "fizz buzz",
+  x %%  5 == 0 ~ "buzz",
+  x %%  3 == 0 ~ "fizz",
+  TRUE         ~ as.character(x)
+)
+```
+
+```{r}
+x <- c(1, NA, 3, NA, NA)
+y <- c(3, 2,  9, 4, NA)
+z <- c(5, 4, NA, 10, 5)
+
+coalesce(x, y, z)
+```
+
+```{r}
+# https://apps.garrickadenbuie.com/countdown/
+countdown::countdown_app()
+```
+

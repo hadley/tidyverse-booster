@@ -1,0 +1,81 @@
+# Functional programming
+
+<!-- Create new file -->
+
+Big topic: loosely refers to functions that have a function as input or output.
+
+```{r}
+integrate(sin, 0, 2 * pi)
+
+x <- c(rnorm(20, mean = 0, sd = 1), rnorm(30, mean = 0, sd = 2))
+f <- ecdf(x)
+f(0)
+f(3)
+plot(f)
+```
+
+Today we're going to focus on the `map()` family of functions from purrr, because they have a big pay off, typically for data import and report generation. Specifically focus on making reports.
+
+They're an alternative to a common class of for loop which basically looks like:
+
+```{r}
+for (i in seq_along(input)) {
+  output[[i]] <- f(input[[i]])
+}
+```
+
+i.e. the element i of the output only depends on element i of the input
+
+## Why not for loops?
+
+Interlude with slides
+
+## Data import
+
+```{r}
+usethis::use_course("http://bit.ly/30lAoSe")
+```
+
+* Read `excel/gapminder-country.xls`
+* Read `csv/country/*.csv`
+
+Your turn: repeat for year. Repeat for continent.
+
+## Type-stability
+
+`sapply()`
+
+```{r}
+dt <- data.frame(
+  x = ordered("a"),
+  y = Sys.time(),
+  z = 1
+)
+sapply(dt[1:3], class)
+sapply(dt[1:2], class)
+sapply(dt[3], class)
+```
+
+`vapply()` is type-stable, but is a lot of typing
+
+## Parameterised R markdown
+
+Open `report-country.Rmd` and knit it.  Where does the country come from? Can you make it display data for the United Kingdom instead?
+
+Read the help for `rmarkdown::render()`. Can you make it render separate PDFs for New Zealand and the United Kingdom? (Without touching the .Rmd)
+
+Can you write a for-loop that renders each country to a separate report?
+
+`walk2()` is a wrapper for the following for-loop:
+
+```{r}
+# walk2(x, y, ~ f(.x, .y))
+
+for (i in 1:length(x)) {
+  f(x[[i]], y[[i]])
+}
+```
+
+Can you rewrite the for loop to use `walk2()` instead?
+
+<!-- COMMIT TO GIT -->

@@ -1,0 +1,186 @@
+# tidyeval
+
+<!-- Create new file -->
+
+Tidy evaluation is the system used throughout the tidyverse that allows you to type variable names without typing the data frame name:
+
+```{r}
+library(tidyverse)
+
+diamonds %>% 
+  ggplot(aes(carat, price)) + 
+  geom_hex()
+
+diamonds %>% 
+  group_by(color, clarity) %>% 
+  summarise(price = mean(price))
+
+carat
+price
+color
+clarity
+```
+
+We call this __data masking__. Helps typing, and makes tools like dbplyr and dtplyr possible.
+
+Generally, when you're doing a data analysis, this just works without you having to think about it. But at some point you're going to produce a bunch of duplicated code with copy and paste:
+
+```{r}
+diamonds %>% 
+  group_by(color) %>% 
+  summarise(price = mean(price))
+diamonds %>% 
+  group_by(clarity) %>% 
+  summarise(price = mean(price))
+diamonds %>% 
+  group_by(cut) %>% 
+  summarise(price = mean(price))
+```
+
+And you'll want to make a function. If you use your existing function making skills, you'll hit a problem:
+
+```{r}
+mean_price <- function(df, by) {
+  diamonds %>% 
+    group_by(by) %>% 
+    summarise(price = mean(price))
+}
+diamonds %>% mean_price(by = cut)
+```
+
+Now rather than referring to the column directly, you want to refer to it indirectly - you want to tell `group_by` to group by the varible recorded in `by`, not literally group by the variable called `by`.
+
+Fixing this problem requires two steps:
+
+1. Identify that it's a tidyeval problem; i.e. you're trying to refer to
+   a data frame variable that's stored in a function argument; and you're
+   inside the tidyverse
+
+2. Know about embracing `{{ }}`
+
+```{r}
+mean_price <- function(df, by) {
+  diamonds %>% 
+    group_by({{ by }}) %>% 
+    summarise(price = mean(price))
+}
+diamonds %>% mean_price(by = cut)
+diamonds %>% mean_price(by = color)
+```
+
+Inspired by the very awesome glue package:
+
+```{r}
+library(glue)
+name <- "Hadley"
+glue("Hello {name}!")
+```
+
+
+(Previously you had to know a bunch of theory about how tidyeval works; that's no longer the case!)
+
+Seriously that's now 90% of what you need to know to use tidyeval for simple cases.
+
+---
+
+```{r}
+library(tidyverse)
+
+mtcars %>% pull(am)
+
+by_cyl <- mtcars %>%
+  group_by(cyl) %>%
+  summarise(mean = mean(mpg))
+
+ggplot(by_cyl, aes(cyl, mpg)) + 
+  geom_point()
+```
+
+
+## Other places where you don't need tidy eval
+
+### Data
+
+```{r}
+diamonds %>% 
+  filter(x == 0) %>% 
+  summarise(
+    n = n(), 
+    price = paste0(min(price), "--", max(price)),
+    carat = paste0(min(carat), "--", max(carat)),
+  )
+
+diamonds %>% 
+  filter(y == 0) %>% 
+  summarise(
+    n = n(), 
+    price = paste0(min(price), "--", max(price)),
+    carat = paste0(min(carat), "--", max(carat)),
+  )
+
+diamonds %>% 
+  filter(z == 0) %>% 
+  summarise(
+    n = n(), 
+    price = paste0(min(price), "--", max(price)),
+    carat = paste0(min(carat), "--", max(carat)),
+  )
+```
+
+How can we reduce the duplication here? Your turn: first make a range summary function.
+
+```{r}
+range_sum <- function(x) {
+  
+}
+
+# Bonus points: optionally allow specification of the number decimal places too
+```
+
+Next make a diamonds summary function:
+
+```{r}
+diamonds_sum <- function(df) {
+  df %>% 
+    summarise(
+      n = n(),
+      price = range_sum(price),
+      carat = range_sum(carat)
+    )
+}
+```
+
+This is easy because the data frame argument doesn't use tidy evaluation! You should always check that tidy eval is needed before you try something more complicated.
+
+### Dots
+
+Another case that lets you avoid tidy eval is taking advantage of `...` to forward on multiple arguments.
+
+For example, we could rewrite `mean_price()`  using `...`:
+
+```{r}
+mean_price <- function(df, ...) {
+  diamonds %>% 
+    group_by(...) %>% 
+    summarise(price = mean(price))
+}
+diamonds %>% mean_price(cut, color)
+```
+
+The advantage is that we can group by any number of variables; the disadvantage is that it becomes harder to pass on other arguments (and `...` silently swallows misnamed args)
+
+
+## Other challenges
+
+Setting names requires `:=`.
+
+```{r}
+count_top <- function(df, var, n = 5) {
+  df %>%
+    mutate({{ var }} := fct_lump(fct_infreq({{ var }}), n = n)) %>%
+    group_by({{ var }}) %>%
+    summarise(n = as.integer(sum(weight)))
+}
+```
+
+<!-- COMMIT TO GIT -->
