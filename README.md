@@ -1,0 +1,15 @@
+# tidyverse-booster
+
+Notes and live code for a live-coding class "boosting your tidyverse skills"
+
+* Thinking about types
+* Using functional programming
+* Everything you really need to know about tidy eval
+
+## Setup
+
+```R
+install.packages("tidyverse")
+install.packages("gapminder")
+usethis::use_course("http://bit.ly/30lAoSe")
+```
