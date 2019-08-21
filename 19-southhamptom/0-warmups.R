@@ -69,5 +69,7 @@ x <- c(1, NA, 3, NA, NA)
 y <- c(3, 2,  9, 4, NA)
 z <- c(5, 4, NA, 10, 5)
 
-coalesce(x, y, z)
+cbind(x, y, z)
+
+coalesce(x, 0)
 
