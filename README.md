@@ -13,3 +13,9 @@ install.packages("tidyverse")
 install.packages("gapminder")
 usethis::use_course("http://bit.ly/30lAoSe")
 ```
+
+## Resources
+
+* https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006023#sec004
+* http://teachtogether.tech/#s:performance
+
