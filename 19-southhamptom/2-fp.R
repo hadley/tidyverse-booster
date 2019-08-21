@@ -101,3 +101,36 @@ output <- vector("list", length(x))
 for (i in seq_along(paths)) {
   output[[i]] <- f(x[[i]], y[[i]])
 }
+
+
+# Continent nesting -------------------------------------------------------
+
+paths <- dir(
+  "~/Desktop/mind-the-gap/excel/",
+  pattern = "^continent-",
+  full.names = TRUE
+)
+paths
+
+plan <- tibble(
+  path = paths,
+  sheet = map(paths, ~ excel_sheets(.x))
+)
+
+plan2 <- plan %>%
+  unnest(sheet) %>%
+  mutate(data = map2(path, sheet, ~ read_excel(.x, sheet = .y)))
+
+plan3 <- plan2 %>%
+  mutate(
+    path = path %>%
+      basename() %>%
+      str_replace(".xlsx", "") %>%
+      str_replace("continent-", "")
+  ) %>%
+  rename(
+    continent = path,
+    country = sheet
+  )
+
+plan3 %>% unnest(data)
