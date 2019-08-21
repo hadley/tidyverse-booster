@@ -98,3 +98,15 @@ col_means("x")
 # a + b
 # pmin(a, b)
 # paste(a, b) # without collapse
+
+# "recycling rules"
+# duplicate the short vector to the same length as the
+# longer, warning if it is not a whole number of times
+
+c(1, 2, 3) + c(10, 20, 30)
+c(1, 2, 3) + 100
+c(1, 2, 3) + c(10, 20)
+
+1:10 + 1:2
+filter(diamonds, cut == c("Good", "Very Good"))
+filter(diamonds, cut %in% c("Good", "Very Good"))
