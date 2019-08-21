@@ -51,13 +51,13 @@ The "type" of a function is the type of its inputs, and the type of its output. 
 * `dplyr::lag()`
 * `paste()` (with `collapse`)
 
-(Remeber red post-it means you need help; green means that you're done)
+(Remember red post-it means you need help; green means that you're done)
 
 ---
 
 <!-- COMMIT TO GIT -->
 
-For most function the output type can be descrbied in a straightforward way from the types of its inputs. I think this is generally a really important principle: if you can't easily do this, then your simple mental model of R isn't going to work well with the function.
+For most function the output type can be described in a straightforward way from the types of its inputs. I think this is generally a really important principle: if you can't easily do this, then your simple mental model of R isn't going to work well with the function.
 
 ```{r}
 complicated_type <- function(x, y) {
